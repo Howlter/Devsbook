@@ -10,11 +10,11 @@ class LoginHandler {
             $token = $_SESSION['token'];
 
             $data = User::select()->where('token', $token)->one();
-            if (count($data) > 0) {
+            if ((bool)$data) {
                 $loggedUser = new User();
                 $loggedUser->id = $data['id'];
-                $loggedUser->email = $data['email'];
                 $loggedUser->name = $data['name'];
+                $loggedUser->email = $data['email'];
 
                 return $loggedUser;
             }
@@ -46,9 +46,9 @@ class LoginHandler {
         $hash =password_hash($password, PASSWORD_DEFAULT);
         $token = md5(time().rand(0,9999).time());
         User::insert([
+            'name' => $name,
             'email'=> $email,
             'password'=> $hash,
-            'name' => $name,
             'birthdate' => $birthdate,
             'token' => $token
         ])->execute();
