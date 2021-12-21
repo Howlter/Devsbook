@@ -27,12 +27,14 @@ class LoginHandler {
         if ($user) {
            if (password_verify($password, $user['password'])) {
                $token = md5(time().rand(0,9999).time());
-               return $token;
 
                User::update()
                ->set('token', $token) 
                ->where('email', $email)
                ->execute();
+
+               return $token;
+
            } 
            
         } 
