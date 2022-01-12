@@ -19,7 +19,8 @@ class PostHandler {
         }
     }
 
-    public static function getHomeFeed($idUser){
+    public static function getHomeFeed($idUser, $page) {
+        $perPage = 2;
         // 1. Pegar lista de usúarios que está seguindo
         $userList = UserRelation::select()->where('user_from', $idUser)->get();
         $users = [];
@@ -32,7 +33,14 @@ class PostHandler {
         $postList = Post::select()
             ->where('id_user', 'in', $users)
             ->orderBy('created_at', 'desc')
+            ->page($page, $perPage)
         ->get();
+
+        $total = Post::select()
+        ->where('id_user', 'in', $users)
+        ->count();
+        $pageCount = ceil($total / $perPage);
+
 
         //3. Transformar em objetos do models
         $posts = [];
@@ -68,6 +76,10 @@ class PostHandler {
             $posts[] = $newPost;
         }
                     //5. Retornar o resultado
-                    return $posts;
+                    return [
+                        'posts'=>$posts,
+                        'pageCount'=> $pageCount,
+                        'currentPage'=> $page
+                    ];
     }
 }
